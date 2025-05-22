@@ -1,34 +1,61 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect, useRef } from 'react'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const wrapperRef = useRef()
+  const gameRef = useRef()
+
+  const resize = () => {
+    const w = window.innerWidth
+    const h = window.innerHeight
+    const aspect = 16 / 9
+    const isPortrait = h > w
+
+    let gameW, gameH
+    if (w / h < aspect) {
+      // 宽比高度还“瘦”，用宽度算高
+      gameW = w
+      gameH = w / aspect
+    } else {
+      // 高比宽度还“瘦”，用高度算宽
+      gameH = h
+      gameW = h * aspect
+    }
+
+    const wrapper = wrapperRef.current
+    const game = gameRef.current
+
+    // 设置 wrapper 尺寸和旋转
+    if (isPortrait) {
+      wrapper.style.width = `${h}px`
+      wrapper.style.height = `${w}px`
+      wrapper.style.transform = `translate(-50%, -50%) rotate(90deg)`
+    } else {
+      wrapper.style.width = `${w}px`
+      wrapper.style.height = `${h}px`
+      wrapper.style.transform = `translate(-50%, -50%) rotate(0deg)`
+    }
+
+    // 设置 game 尺寸（始终横屏）
+    game.style.width = `${gameW}px`
+    game.style.height = `${gameH}px`
+  }
+
+  useEffect(() => {
+    resize()
+    window.addEventListener('resize', resize)
+    return () => window.removeEventListener('resize', resize)
+  }, [])
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="viewport">
+      <div className="wrapper" ref={wrapperRef}>
+        <div className="game" ref={gameRef}>
+          <h1>强制横屏显示</h1>
+          <p>16:9 比例，短边适配，旋转后仍保持一致</p>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   )
 }
 
