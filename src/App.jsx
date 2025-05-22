@@ -5,41 +5,49 @@ function App() {
   const wrapperRef = useRef()
   const gameRef = useRef()
 
-  const resize = () => {
-    const w = window.innerWidth
-    const h = window.innerHeight
-    const aspect = 16 / 9
-    const isPortrait = h > w
+//     if (screen.orientation && screen.orientation.lock) {
+//   screen.orientation.lock("landscape").catch(err => {
+//     console.warn('屏幕方向锁定失败', err)
+//   })
+// }
 
-    let gameW, gameH
-    if (w / h < aspect) {
-      // 宽比高度还“瘦”，用宽度算高
-      gameW = w
-      gameH = w / aspect
-    } else {
-      // 高比宽度还“瘦”，用高度算宽
+
+  const resize = () => {
+  const w = window.innerWidth
+  const h = window.innerHeight
+  const aspect = 16 / 9
+  const isPortrait = h > w
+
+  const wrapper = wrapperRef.current
+  const game = gameRef.current
+
+  let gameW, gameH
+
+  if (isPortrait) {
+    // 🟢 真正以旋转后的横屏宽度（竖屏的高度）来适配
+    gameW = h
+    gameH = h / aspect
+    wrapper.style.width = `${h}px`
+    wrapper.style.height = `${w}px`
+    wrapper.style.transform = `translate(-50%, -50%) rotate(90deg)`
+  } else {
+    // 🟢 横屏以屏幕高度为短边适配
+    if (w / h > aspect) {
       gameH = h
       gameW = h * aspect
-    }
-
-    const wrapper = wrapperRef.current
-    const game = gameRef.current
-
-    // 设置 wrapper 尺寸和旋转
-    if (isPortrait) {
-      wrapper.style.width = `${h}px`
-      wrapper.style.height = `${w}px`
-      wrapper.style.transform = `translate(-50%, -50%) rotate(90deg)`
     } else {
-      wrapper.style.width = `${w}px`
-      wrapper.style.height = `${h}px`
-      wrapper.style.transform = `translate(-50%, -50%) rotate(0deg)`
+      gameW = w
+      gameH = w / aspect
     }
-
-    // 设置 game 尺寸（始终横屏）
-    game.style.width = `${gameW}px`
-    game.style.height = `${gameH}px`
+    wrapper.style.width = `${w}px`
+    wrapper.style.height = `${h}px`
+    wrapper.style.transform = `translate(-50%, -50%) rotate(0deg)`
   }
+
+  game.style.width = `${gameW}px`
+  game.style.height = `${gameH}px`
+}
+
 
   useEffect(() => {
     resize()
