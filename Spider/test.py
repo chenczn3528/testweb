@@ -30,7 +30,10 @@ try:
     # print(soup.prettify())
     albums = []
 
-    for li in soup.select("ul#m-song-module li"):
+    lis = soup.select("ul#m-song-module li")
+    print("li count:", len(lis))  # 查看是否卡在这里
+
+    for li in lis:
         print("li.text:", li.text)
         print("li", li)
         a_tag = li.select_one("a.msk")
