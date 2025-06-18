@@ -18,20 +18,21 @@ driver.set_page_load_timeout(60)
 try:
     driver.get("https://music.163.com/album?id=59888486&limit=1000")
 
-    # 显式等待 iframe 出现
-    WebDriverWait(driver, 30).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, "iframe#g_iframe"))
-    )
+    # 1. 切换 iframe
+    WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.ID, "g_iframe")))
 
-    iframe = driver.find_element(By.CSS_SELECTOR, "iframe#g_iframe")
-    driver.switch_to.frame(iframe)
+    # 2. 等待歌曲模块加载出来
+    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.ID, "m-song-module")))
 
-    soup = BeautifulSoup(driver.page_source, "html.parser")
-    # print(soup.prettify())
-    albums = []
+    # 3. 页面 HTML 解析
+    soup = BeautifulSoup(driver.page_source, "lxml")
 
-    lis = soup.select("ul#m-song-module li")
-    print("li count:", len(lis))  # 查看是否卡在这里
+    ul = soup.find("ul", id="m-song-module")
+    if not ul:
+        print("❌ 依然没找到 m-song-module，可能页面结构变了")
+    else:
+        lis = ul.find_all("li")
+        print("li count:", len(lis))
 
     for li in lis:
         print("li.text:", li.text)
