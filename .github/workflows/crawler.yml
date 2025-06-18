@@ -24,10 +24,10 @@ jobs:
         uses: actions/checkout@v2
 
       # Runs a single command using the runners shell
-      - name: 'Set up Python'
-        uses: actions/setup-python@v1
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-           python-version: 3.7
+          python-version: '3.x'
       - name: 'Install requirements'
         run: pip install -r ./Spider/requirements.txt
       - name: 'Working'
