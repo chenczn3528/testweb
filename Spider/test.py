@@ -27,7 +27,27 @@ try:
     driver.switch_to.frame(iframe)
 
     soup = BeautifulSoup(driver.page_source, "html.parser")
-    print(soup.prettify())
+    # print(soup.prettify())
+    albums = []
+
+    for li in soup.select("ul#m-song-module li"):
+        print("li.text:", li.text)
+        print("li", li)
+        a_tag = li.select_one("a.msk")
+        if not a_tag:
+            continue
+        href = a_tag.get("href", "")
+        album_id = href.split("id=")[-1] if "id=" in href else None
+
+        title = li.select_one("p.dec a.tit")
+        if title:
+            album_title = title.text.strip()
+        else:
+            album_title = li.select_one("div.u-cover")["title"] if li.select_one("div.u-cover") else "未知专辑"
+
+        if album_id:
+            albums.append((album_id, album_title))
+            print(album_id, album_title)
 
 except Exception as e:
     print("iframe 加载失败:", e, flush=True)
